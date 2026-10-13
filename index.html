@@ -452,7 +452,9 @@
         // NOTA: este archivo usa solo caracteres ASCII (entidades HTML para las
         // tildes) a proposito, para evitar problemas de codificacion al copiar y
         // pegar el contenido en el editor web de GitHub.
-        const SUPABASE_URL = 'https://tbvkfbppzgsgacdyhqcn.supabase.co';
+        const SUPABASE_URL = 'https://zrdlvykhircycpxqjlug.supabase.co';
+        // Proyecto anterior: solo como respaldo mientras termina la migracion de cuenta (2026-10).
+        const SUPABASE_URL_ANTERIOR = 'https://tbvkfbppzgsgacdyhqcn.supabase.co';
         const SUPABASE_BUCKET = 'ReportesSeguimientoOperativo';
 
         function formatPct(val) {
@@ -893,7 +895,11 @@
             const dataUrl = `${SUPABASE_URL}/storage/v1/object/public/${SUPABASE_BUCKET}/${encodeURIComponent(token)}.json`;
 
             try {
-                const resp = await fetch(dataUrl);
+                let resp = await fetch(dataUrl);
+                if (!resp.ok) {
+                    const respAnterior = await fetch(dataUrl.replace(SUPABASE_URL, SUPABASE_URL_ANTERIOR)).catch(() => null);
+                    if (respAnterior && respAnterior.ok) resp = respAnterior;
+                }
                 if (!resp.ok) {
                     app.innerHTML = resp.status === 404
                         ? '<div class="estado-vacio">Este reporte no existe o fue eliminado.</div>'
